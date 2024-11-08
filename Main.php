@@ -1,216 +1,236 @@
-<?php
-
 class Main {
+    private $employeeRoster;
 
-    private EmployeeRoster $roster;
-    private $size;
-    private $repeat;
-
-    public function start() {
-        $this->clear();
-        $this->repeat = true;
-
-        $this->size = readline("Enter the size of the roster: ");
-
-        if ($this->size < 1) {
-            echo "Invalid input. Please try again.\n";
-            readline("Press \"Enter\" key to continue...");
-            $this->start();
-        }
-
+    public function __construct() {
+        echo "Enter the size of the employee roster: ";
+        $size = trim(fgets(STDIN));
+        $this->employeeRoster = new EmployeeRoster($size);
     }
 
-    public function entrance() {
-        $choice = 0;
+    public function start() {
+        do {
+            
+            echo "\nCurrent Roster Size: " . $this->employeeRoster->countEmployees() . " / " . $this->employeeRoster->getRosterSize() . " employees.\n";
+            
+            echo "\nEmployee Roster Menu\n";
+            echo "1. Add Employee\n";
+            echo "2. Delete Employee\n";
+            echo "3. Display Employees\n";
+            echo "4. Count Employees\n";
+            echo "5. Payroll\n";
+            echo "6. Exit\n";
+            echo "Choose an option: ";
 
-        while ($this->repeat) {
-            $this->clear();
-            $this->menu();
+            $choice = trim(fgets(STDIN));
 
             switch ($choice) {
                 case 1:
+                    $this->addEmployee();
                     break;
                 case 2:
+                    $this->deleteEmployee();
                     break;
                 case 3:
+                    $this->displayEmployees();
                     break;
-                case 0:
+                case 4:
+                    $this->countEmployees();
+                    break;
+                case 5:
+                    $this->payroll();
+                    break;
+                case 6:
+                    echo "Exiting...\n";
                     break;
                 default:
                     echo "Invalid input. Please try again.\n";
-                    readline("Press \"Enter\" key to continue...");
-                    $this->entrance();
-                    break;
             }
+        } while ($choice != 6);
+    }
+
+    private function addEmployee() {
+        if ($this->employeeRoster->getRosterSize() <= 0) {
+            echo "Roster is full. No more employees can be added.\n";
+            return;
         }
-        echo "Process terminated.\n";
-        exit;
-    }
 
-    public function menu() {
-        echo "*** EMPLOYEE ROSTER MENU ***\n";
-        echo "[1] Add Employee\n";
-        echo "[2] Delete Employee\n";
-        echo "[3] Other Menu\n";
-        echo "[0] Exit\n";
-    }
+        
+        echo "Enter Employee ID: ";
+        $id = trim(fgets(STDIN));
 
-    public function addMenu() {
-    }
+        
+        while (empty($id)) {
+            echo "Employee ID cannot be empty. Please enter a valid Employee ID: ";
+            $id = trim(fgets(STDIN));
+        }
 
-    public function empType($name, $address, $age, $cName) {
-        $this->clear();
-        echo "---Employee Details \n";
-        echo "Enter name: $name\n";
-        echo "Enter address: $address\n";
-        echo "Enter company name: $cName\n";
-        echo "Enter age: $age\n";
-        echo "[1] Commission Employee       [2] Hourly Employee       [3] Piece Worker";
-        $type = readline("Type of Employee: ");
+        echo "Enter Name: ";
+        $name = trim(fgets(STDIN));
+
+        echo "Enter Address: ";
+        $address = trim(fgets(STDIN));
+
+        echo "Enter Age: ";
+        $age = trim(fgets(STDIN));
+
+        echo "Enter Company Name: ";
+        $companyName = trim(fgets(STDIN));
+
+        echo "Choose employee type:\n";
+        echo "1. PieceWorker\n";
+        echo "2. Hourly Employee\n";
+        echo "3. Commission Employee\n";
+        $type = trim(fgets(STDIN));
 
         switch ($type) {
             case 1:
+                echo "Enter items sold: ";
+                $itemsSold = trim(fgets(STDIN));
+
+                echo "Enter wage per item: ";
+                $wagePerItem = trim(fgets(STDIN));
+
+                $employee = new PieceWorker($name, $address, $age, $companyName, $id, $itemsSold, $wagePerItem);
                 break;
+
             case 2:
+                echo "Enter hours worked: ";
+                $hoursWorked = trim(fgets(STDIN));
+
+                echo "Enter hourly rate: ";
+                $hourlyRate = trim(fgets(STDIN));
+
+                $employee = new HourlyEmployee($name, $address, $age, $companyName, $id, $hoursWorked, $hourlyRate);
                 break;
+
             case 3:
-                break;
-            default:
-                echo "Invalid input. Please try again.\n";
-                readline("Press \"Enter\" key to continue...");
-                $this->empType($name, $address, $age, $cName);
-                break;
-        }
-    }
+                echo "Enter regular salary: ";
+                $regularSalary = trim(fgets(STDIN));
 
-    public function addOnsCE($name, $address, $age, $cName) {
-        $this->repeat();
-    }
+                echo "Enter number of items sold: ";
+                $itemsSold = trim(fgets(STDIN));
 
-    public function addOnsHE($name, $address, $age, $cName) {
-        $this->repeat();
-    }
+                echo "Enter commission rate: ";
+                $commissionRate = trim(fgets(STDIN));
 
-    public function addOnsPE($name, $address, $age, $cName) {
-        $this->repeat();
-    }
-
-    public function deleteMenu() {
-        $this->clear();
-
-        echo "***List of Employees on the current Roster***\n";
-
-        echo "\n[0] Return\n";
-
-        readline("\nPress \"Enter\" key to continue...");
-        $this->deleteMenu();
-    }
-
-    public function otherMenu() {
-        $this->clear();
-        echo "[1] Display\n";
-        echo "[2] Count\n";
-        echo "[3] Payroll\n";
-        echo "[0] Return\n";
-        $choice = readline("Select Menu: ");
-
-        switch ($choice) {
-            case 1:
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
-            case 0:
+                $employee = new CommissionEmployee($name, $address, $age, $companyName, $id, $regularSalary, $itemsSold, $commissionRate);
                 break;
 
             default:
-                echo "Invalid input. Please try again.\n";
-                readline("Press \"Enter\" key to continue...");
-                $this->otherMenu();
-                break;
-        }
-    }
-
-    public function displayMenu() {
-        $this->clear();
-        echo "[1] Display All Employee\n";
-        echo "[2] Display Commission Employee\n";
-        echo "[3] Display Hourly Employee\n";
-        echo "[4] Display Piece Worker\n";
-        echo "[0] Return\n";
-        $choice = readline("Select Menu: ");
-
-        switch ($choice) {
-            case 0:
-                break;
-            case 1:
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
-            case 4:
-                break;
-
-            default:
-                echo "Invalid Input!";
-                break;
+                echo "Invalid input\n";
+                return;
         }
 
-        readline("\nPress \"Enter\" key to continue...");
-        $this->displayMenu();
-    }
-
-    public function countMenu() {
-        $this->clear();
-        echo "[1] Count All Employee\n";
-        echo "[2] Count Commission Employee\n";
-        echo "[3] Count Hourly Employee\n";
-        echo "[4] Count Piece Worker\n";
-        echo "[0] Return\n";
-        $choice = readline("Select Menu: ");
-
-        switch ($choice) {
-            case 0:
-                break;
-
-            case 1:
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
-            case 4:
-                break;
-
-            default:
-                echo "Invalid Input!";
-                break;
-        }
-
-
-        readline("\nPress \"Enter\" key to continue...");
-        $this->countMenu();
-    }
-
-    public function clear() {
-        system('clear');
-    }
-
-    public function repeat() {
-        echo "Employee Added!\n";
-        if ($this->roster->count() < $this->size) {
-            $c = readline("Add more ? (y to continue): ");
-            if (strtolower($c) == 'y')
-                $this->addMenu();
-            else
-                $this->entrance();
-
+        if ($this->employeeRoster->addEmployee($employee)) {
+            echo "Employee added successfully!\n";
         } else {
-            echo "Roster is Full\n";
-            readline("Press \"Enter\" key to continue...");
-            $this->entrance();
+            echo "Roster is full, can't add employee.\n";
+        }
+    }
+
+    private function deleteEmployee() {
+        echo "Enter Employee ID to delete: ";
+        $id = trim(fgets(STDIN));
+
+        if ($this->employeeRoster->deleteEmployee($id)) {
+            echo "Employee deleted successfully!\n";
+        } else {
+            echo "Employee not found.\n";
+        }
+    }
+
+    private function displayEmployees() {
+        echo "Employee Display Options:\n";
+        echo "1. Display All Employees\n";
+        echo "2. Display Piece Worker Employees\n";
+        echo "3. Display Hourly Employees\n";
+        echo "4. Display Commission Employees\n";
+        echo "Enter your choice: ";
+
+        $choice = trim(fgets(STDIN));
+
+        switch ($choice) {
+            case 1:
+                $this->employeeRoster->listEmployees();
+                break;
+            case 2:
+                foreach ($this->employeeRoster->getEmployeeRoster() as $employee) {
+                    if ($employee instanceof PieceWorker) {
+                        echo $employee . PHP_EOL;
+                    }
+                }
+                break;
+            case 3:
+                foreach ($this->employeeRoster->getEmployeeRoster() as $employee) {
+                    if ($employee instanceof HourlyEmployee) {
+                        echo $employee . PHP_EOL;
+                    }
+                }
+                break;
+            case 4:
+                
+                foreach ($this->employeeRoster->getEmployeeRoster() as $employee) {
+                    if ($employee instanceof CommissionEmployee) {
+                            echo $employee . PHP_EOL;
+                    }
+                }
+                break;
+            default:
+                echo "Invalid choice.\n";
+        }
+    }
+
+    private function countEmployees() {
+        echo "Employee Count Options:\n";
+        echo "1. Count All Employees\n";
+        echo "2. Count Piece Worker Employees\n";
+        echo "3. Count Hourly Employees\n";
+        echo "4. Count Commission Employees\n";
+        echo "Enter your choice: ";
+
+        $choice = trim(fgets(STDIN));
+
+        switch ($choice) {
+            case 1:
+                echo "Total Employees: " . $this->employeeRoster->countEmployees() . PHP_EOL;
+                break;
+            case 2:
+                $count = 0;
+                foreach ($this->employeeRoster->getEmployeeRoster() as $employee) {
+                    if ($employee instanceof PieceWorker) {
+                        $count++;
+                    }
+                }
+                echo "Commission Employees: $count\n";
+                break;
+            case 3:
+                $count = 0;
+                foreach ($this->employeeRoster->getEmployeeRoster() as $employee) {
+                    if ($employee instanceof HourlyEmployee) {
+                        $count++;
+                    }
+                }
+                echo "Hourly Employees: $count\n";
+                break;
+            case 4:
+                $count = 0;
+                
+                foreach ($this->employeeRoster->getEmployeeRoster() as $employee) {
+                    if ($employee instanceof CommissionEmployee) {
+                        $count++;
+                    }
+                }
+                echo "Piece Worker Employees: $count\n";
+                break;
+            default:
+                echo "Invalid input.\n";
+        }
+    }
+
+    private function payroll() {
+        echo "Payroll Information:\n";
+        foreach ($this->employeeRoster->getEmployeeRoster() as $employee) {
+            echo $employee . " | Earnings: " . $employee->calculateEarnings() . PHP_EOL;
         }
     }
 }
